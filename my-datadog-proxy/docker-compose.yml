@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  proxy:
+    build: .
+    container_name: my-proxy
+    ports:
+      - "8081:8081"
+    environment:
+      - DD_ENV=dev
+      - DD_SERVICE=my-proxy
+    network_mode: "host"
+

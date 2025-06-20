@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  datadog:
+    image: datadog/agent:latest
+    container_name: datadog
+    environment:
+      - DD_API_KEY=66351e330346b0c2558cc49ad46f87b2       
+      - DD_SITE=us5.datadoghq.com
+      - DD_APM_ENABLED=true                 # ← Active APM (port 8126)
+      - DD_LOGS_ENABLED=false               # ← Pas besoin des logs ici
+      - DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true
+    ports:
+      - "8126:8126"                         # ← Port APM exposé à ta machine
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
