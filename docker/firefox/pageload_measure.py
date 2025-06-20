@@ -35,12 +35,17 @@ def initFireFoxOptions():
     options.set_preference('network.trr.mode', 0)
     return options
 
-def initFireFoxProfile(dane: bool, proxy_host: str):
+def initFireFoxProfile(dane: bool, dane_proxy_host: str, nondane_proxy_host: str):
     profile = FirefoxProfile()
 
-    proxy_port = 8080 if dane else 8081
-        proxy_host = proxy_host
+    if dane:
+        proxy_host = dane_proxy_host
+        proxy_port = 8080
+    else:
+        proxy_host = nondane_proxy_host
+        proxy_port = 8081
         
+    if proxy_host: # Only set proxy if a host is provided
         profile.set_preference("network.proxy.type", 1)
         profile.set_preference("network.proxy.http", proxy_host)
         profile.set_preference("network.proxy.http_port", proxy_port)
@@ -73,7 +78,8 @@ def main():
     )
     parser.add_argument('website', type=str, help='The website to load')
     parser.add_argument('-ri', '--resolver_ip', type=str, help='The IP address of the resolver to use')
-    parser.add_argument('-ph', '--proxy_host', type=str, help='The host name of the proxy to use')
+    parser.add_argument('-dph', '--dane_proxy_host', type=str, help='The host name of the DANE proxy to use')
+    parser.add_argument('-ndph', '--nondane_proxy_host', type=str, help='The host name of the non-DANE proxy to use')
     parser.add_argument('--timeout', type=int, default=30, help='The maximum time to wait for the page to load')
     parser.add_argument('--dane', action='store_true', help='Enable DANE validation')
     parser.add_argument('--fill_cache_only', action='store_true', help='Only fill the cache and exit')
@@ -84,7 +90,7 @@ def main():
         overwrite_resolv_conf(args.resolver_ip)
 
     options = initFireFoxOptions()
-    profile = initFireFoxProfile(args.dane, args.proxy_host)
+    profile = initFireFoxProfile(args.dane, args.dane_proxy_host, args.nondane_proxy_host)
     profile.set_preference('devtools.toolbox.selectedTool', 'netmonitor')
     driver = initFireFoxDriver(options, profile)
 

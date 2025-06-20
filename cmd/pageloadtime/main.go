@@ -295,11 +295,15 @@ func runFireFoxHAR(opts *commandOptions) ([]byte, error) {
 	dockerCmd := []string{"docker", "run", "--network", opts.HARDockerRunOpts.NetWork, "--name", opts.HARDockerRunOpts.ContainerName, opts.HARDockerRunOpts.ImageName}
 	firefoxHARCmd := []string{opts.HAROpts.Website}
 	if opts.HAROpts.DANE {
-		firefoxHARCmd = append(firefoxHARCmd, "-ph", opts.HAROpts.ProxyHost)
+		firefoxHARCmd = append(firefoxHARCmd, "-dph", opts.HAROpts.ProxyHost)
 		firefoxHARCmd = append(firefoxHARCmd, "--dane")
 	} else {
+		// Even if DANE is not used for this specific measurement, pageload_measure.py might need the resolver.
+		// Also, providing non-DANE proxy for consistency, though it might not be used.
 		firefoxHARCmd = append(firefoxHARCmd, "-ri", opts.HAROpts.ResolverIP)
 	}
+	// Add non-DANE proxy host regardless of DANE status, the python script will decide.
+	firefoxHARCmd = append(firefoxHARCmd, "-ndph", "my-datadog-proxy")
 
 	if opts.HAROpts.FillCacheOnly {
 		firefoxHARCmd = append(firefoxHARCmd, "--fill_cache_only")
@@ -325,11 +329,13 @@ func runFireFoxHARForFillCache(opts *commandOptions) ([]byte, error) {
 	dockerCmd := []string{"docker", "run", "--rm", "--network", opts.HARDockerRunOpts.NetWork, "--name", opts.HARDockerRunOpts.ContainerName + "-fill-cache", opts.HARDockerRunOpts.ImageName}
 	firefoxHARCmd := []string{opts.HAROpts.Website}
 	if opts.HAROpts.DANE {
-		firefoxHARCmd = append(firefoxHARCmd, "-ph", opts.HAROpts.ProxyHost+"-fill-cache")
+		firefoxHARCmd = append(firefoxHARCmd, "-dph", opts.HAROpts.ProxyHost+"-fill-cache")
 		firefoxHARCmd = append(firefoxHARCmd, "--dane")
 	} else {
 		firefoxHARCmd = append(firefoxHARCmd, "-ri", opts.HAROpts.ResolverIP)
 	}
+	// Add non-DANE proxy host regardless of DANE status for cache filling as well.
+	firefoxHARCmd = append(firefoxHARCmd, "-ndph", "my-datadog-proxy")
 
 	firefoxHARCmd = append(firefoxHARCmd, "--fill_cache_only")
 

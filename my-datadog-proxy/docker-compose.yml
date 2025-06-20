@@ -1,13 +1,12 @@
 version: '3.8'
 
 services:
-  proxy:
+  my-datadog-proxy:
     build: .
-    container_name: my-proxy
+    container_name: my-datadog-proxy
     ports:
       - "8081:8081"
     environment:
       - DD_ENV=dev
       - DD_SERVICE=my-proxy
-    network_mode: "host"
 
