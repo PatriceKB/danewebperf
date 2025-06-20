@@ -38,9 +38,9 @@ def initFireFoxOptions():
 def initFireFoxProfile(dane: bool, proxy_host: str):
     profile = FirefoxProfile()
 
-    proxy_port = 8080 if dane else 8081
+        proxy_port = 8080 if dane else 8081    
         proxy_host = proxy_host
-        
+
         profile.set_preference("network.proxy.type", 1)
         profile.set_preference("network.proxy.http", proxy_host)
         profile.set_preference("network.proxy.http_port", proxy_port)
